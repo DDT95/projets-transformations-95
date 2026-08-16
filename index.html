@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="Les grands projets et transformations territoriales du Val-d’Oise" />
+    <title>Projets & transformations · Val-d’Oise · DDT 95</title>
+    <link rel="preconnect" href="https://tile.openstreetmap.org" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <link rel="stylesheet" href="css/style.css?v=1" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand-logo-link" href="https://ddt95.github.io/atlas-territorial-95/#comprendre">
+        <img class="brand-logo" src="https://ddt95.github.io/atlas-territorial-95/prefet-val-doise-logo.png" alt="Préfet du Val-d’Oise" />
+      </a>
+      <div class="title-block">
+        <span class="eyebrow">AMÉNAGEMENT · MOBILITÉS · VAL-D’OISE</span>
+        <h1>Comment le territoire se transforme-t-il&nbsp;?</h1>
+        <p>Grands projets · infrastructures · quartiers · espaces publics</p>
+      </div>
+      <button id="mobileLayers" class="mobile-layers">Données</button>
+      <button id="openDataTop" class="livebox"><span class="fresh-dot"></span><div><strong>Vue d’ensemble</strong><small>Synthèse départementale</small></div></button>
+    </header>
+
+    <main class="workspace">
+      <aside id="layerSidebar" class="sidebar">
+        <div class="sidebar-intro"><span class="eyebrow">PROJETS · VAL-D’OISE</span><h2>Explorer les transformations</h2><p>Recherchez un territoire, filtrez par thème ou par étape, puis ouvrez une fiche projet.</p></div>
+        <label class="search-box"><span>Rechercher un projet ou un territoire</span><div><input id="searchInput" type="search" placeholder="Ex. Gonesse, transport…" /><button id="searchButton">Rechercher</button></div></label>
+        <div id="searchResults" class="search-results" hidden></div>
+        <div class="quick-actions"><button id="resetView">Recentrer</button><button id="openData">Vue d’ensemble</button></div>
+        <div class="layers-scroll" aria-label="Filtres cartographiques">
+          <section class="layers-panel">
+            <div class="section-head"><div><h2>Afficher sur la carte</h2><p>Les filtres se combinent.</p></div><span class="status-local">Sélection</span></div>
+            <div class="theme-heading"><span>THÉMATIQUES</span><button id="selectAll" type="button">Tout afficher</button></div>
+            <div id="themeFilters" class="layer-cards"></div>
+            <div class="theme-heading stage"><span>ÉTAPES DU PROJET</span></div>
+            <div id="stageFilters" class="stage-filters"></div>
+            <div class="theme-heading stage"><span>REPÈRES</span></div>
+            <button class="layer-card active" id="toggleCommunes"><i class="layer-swatch commune"></i><span><b>Limites communales</b><small>183 communes · cliquez pour filtrer</small></span><i class="layer-switch"></i></button>
+          </section>
+        </div>
+        <button id="openMethod" class="sources-inline">Sources, méthode et limites</button>
+        <div class="sidebar-footer"><span class="fresh-dot"></span><div><strong>Données publiques documentées</strong><small>État · maîtres d’ouvrage · collectivités</small></div></div>
+      </aside>
+
+      <section class="map-shell">
+        <div id="map"></div>
+        <div class="map-count"><strong id="visibleCount">0</strong><span>projets affichés</span></div>
+        <div id="mapLegend" class="map-legend"><strong>Repères</strong><span><i class="dot mobility"></i>Mobilités</span><span><i class="dot planning"></i>Aménagement</span><span><i class="dot environment"></i>Cadre de vie</span></div>
+        <div class="map-note"><span class="pulse"></span><span id="mapStatus">Cliquez un projet pour ouvrir sa fiche</span></div>
+      </section>
+      <aside id="detailPanel" class="detail-panel"><button id="closeDetail" class="close-btn">×</button><div id="detailContent"></div></aside>
+    </main>
+
+    <dialog id="synthesisDialog" class="dialog synthesis-dialog"><button class="dialog-close" data-close="synthesisDialog">×</button><div id="synthesisContent" class="synthesis-dashboard"></div></dialog>
+    <dialog id="methodDialog" class="dialog"><button class="dialog-close" data-close="methodDialog">×</button><div class="dialog-header"><span class="eyebrow">DONNÉES</span><h2>Sources et méthode</h2><p>Une carte de repérage, pas un inventaire réglementaire.</p></div><div class="dialog-body"><h3>Périmètre</h3><p>La page rassemble une sélection de transformations structurantes, documentées par une source publique et localisables dans le Val-d’Oise. Un point situe le secteur principal du projet ; il ne représente pas son emprise exacte.</p><h3>Mise à jour</h3><p>Les étapes sont établies à partir des pages officielles consultées en août 2026. Elles peuvent évoluer : la fiche renvoie systématiquement vers la source du maître d’ouvrage ou de l’autorité publique.</p><h3>Limites</h3><p>L’absence d’un projet ne signifie pas qu’il n’existe pas. Les opérations communales et privées ne sont pas recensées de manière exhaustive. Les calendriers annoncés restent prévisionnels.</p><h3>Sources</h3><p>Préfecture du Val-d’Oise, Société des grands projets, Île-de-France Mobilités, Grand Paris Aménagement, SNCF Réseau et collectivités porteuses.</p></div></dialog>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="js/app.js?v=1"></script>
+  </body>
+</html>
