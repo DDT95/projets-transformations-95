@@ -7,7 +7,7 @@
     <title>Projets & transformations · Val-d’Oise · DDT 95</title>
     <link rel="preconnect" href="https://tile.openstreetmap.org" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-    <link rel="stylesheet" href="css/style.css?v=2" />
+    <link rel="stylesheet" href="css/style.css?v=3" />
   </head>
   <body>
     <main class="app-shell">
@@ -29,6 +29,7 @@
         <div class="intro"><span class="kicker">RECHERCHER ET COMPRENDRE</span><h2>Les projets qui<br><span>transforment le territoire</span></h2><p>Recherchez un lieu, filtrez les projets, puis cliquez sur un point pour ouvrir sa fiche complète.</p></div>
         <label class="search"><span>Projet, thématique ou commune</span><div><input id="searchInput" type="search" placeholder="Gonesse, transport, forêt…" /><button id="searchButton">Rechercher</button></div><small><b id="filterCount">12</b> résultat(s) affiché(s)</small></label>
         <div id="searchResults" class="search-results" hidden></div>
+        <div class="quick-actions"><button id="resetView">Recentrer</button><button id="openData">Données & évolutions</button></div>
         <div class="category-list" aria-label="Filtres cartographiques">
             <div class="list-title"><strong>AFFICHAGE DE LA CARTE</strong><div><button id="hideAll" type="button">Tout masquer</button><button id="selectAll" type="button">Tout afficher</button></div></div>
             <div id="themeFilters" class="layer-cards"></div>
@@ -41,7 +42,7 @@
 
       <section class="map-wrap">
         <div id="map"></div>
-        <div class="map-tools"><button id="resetView">Recentrer</button><button id="openData">Vue d’ensemble</button><span id="mapStatus">Cliquez un projet pour ouvrir sa fiche</span></div>
+        <div class="map-note"><i></i><span id="mapStatus">Cliquez un projet pour ouvrir sa fiche</span></div>
         <div id="mapLegend" class="map-legend"><strong id="visibleCount">0</strong><span>projets dans la sélection</span></div>
       </section>
       <aside id="detailPanel" class="detail-panel"><button id="closeDetail" class="close-btn">×</button><div id="detailContent"></div></aside>

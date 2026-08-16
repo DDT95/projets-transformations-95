@@ -53,4 +53,10 @@ No actionable P0, P1 or P2 visual mismatch remains. Content naturally differs fr
 - “Recentrer” now resets themes, stages, commune selection, search, details panel, communal styling and department bounds.
 - Closing the right-hand project panel applies the same full reset.
 
+### Shared command standard
+
+- “Recentrer” and “Données & évolutions” now use the same two-button block below search as `val-doise-nuisances`.
+- The duplicate floating map buttons were removed.
+- Map feedback now uses the standard bottom-left status note.
+
 final result: passed
