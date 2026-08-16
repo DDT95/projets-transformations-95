@@ -2,7 +2,7 @@
 
 Page cartographique autonome de l’Atlas territorial de la DDT 95.
 
-Elle propose une sélection éditoriale de projets structurants, filtrable par thématique et par étape, avec recherche, vue départementale, fiches sourcées et synthèse.
+Elle croise une sélection éditoriale de grands projets structurants avec les autorisations d’urbanisme SDES–Sitadel agrégées à la commune. Les projets ferroviaires disposent de fiches et d’un corridor indicatif ; logements, locaux et permis d’aménager constituent trois couches activables.
 
 ## Publication
 
@@ -10,4 +10,4 @@ Le site est statique et compatible avec GitHub Pages. La branche `main` est publ
 
 ## Sources
 
-Chaque fiche renvoie vers la page officielle du maître d’ouvrage ou de l’autorité publique. Le point cartographique est un repère et non une emprise réglementaire.
+Chaque fiche renvoie vers la page officielle du maître d’ouvrage ou de l’autorité publique. Les données Sitadel couvrent ici les dépôts 2022–juin 2026 et sont agrégées à la commune. Un repère cartographique n’est pas une emprise réglementaire et une autorisation ne vaut pas mise en chantier.

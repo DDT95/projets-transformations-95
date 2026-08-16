@@ -60,3 +60,14 @@ No actionable P0, P1 or P2 visual mismatch remains. Content naturally differs fr
 - Map feedback now uses the standard bottom-left status note.
 
 final result: passed
+
+### Enrichissement des données — août 2026
+
+- 14 grands projets, dont 3 opérations ferroviaires SNCF Réseau documentées.
+- 183 communes couvertes par une extraction SDES–Sitadel : 2 839 autorisations logements, 19 393 logements déclarés, 1 949 autorisations de locaux et 341 permis d’aménager depuis 2022.
+- Les trois familles Sitadel sont activables indépendamment et rendues par un symbole agrégé par commune afin de préserver la lisibilité.
+- Fiche communale, synthèse départementale, masquage/affichage et reset testés dans le navigateur.
+- Compteur initial : 196 objets cartographiques (14 projets + 182 communes avec au moins une donnée active).
+- Console : aucune erreur.
+
+final result: passed
