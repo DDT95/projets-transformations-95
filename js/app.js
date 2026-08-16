@@ -35,6 +35,27 @@ function showProject(p){const theme=THEMES[p.theme];$("detailContent").innerHTML
 
 function buildFilters(){const themes=$("themeFilters");Object.entries(THEMES).forEach(([key,t])=>{const count=PROJECTS.filter(p=>p.theme===key).length;const b=document.createElement("button");b.className="layer-card active";b.innerHTML=`<i class="layer-swatch ${key}"></i><span><b>${t.label}</b><small>${count} projet(s) repéré(s)</small></span><i class="layer-switch"></i>`;b.onclick=()=>{state.themes.has(key)?state.themes.delete(key):state.themes.add(key);b.classList.toggle("active",state.themes.has(key));renderProjects();};themes.appendChild(b);});const stages=$("stageFilters");STAGES.forEach(stage=>{const b=document.createElement("button");b.className="stage-chip active";b.textContent=stage;b.onclick=()=>{state.stages.has(stage)?state.stages.delete(stage):state.stages.add(stage);b.classList.toggle("active",state.stages.has(stage));renderProjects();};stages.appendChild(b);});}
 function search(){const q=$("searchInput").value.trim().toLowerCase();const results=$("searchResults");if(!q){results.hidden=true;return;}const matches=PROJECTS.filter(p=>`${p.name} ${p.place} ${THEMES[p.theme].label} ${p.stage}`.toLowerCase().includes(q));results.innerHTML=matches.length?matches.map(p=>`<button data-id="${p.id}"><b>${esc(p.name)}</b><small>${esc(p.place)} · ${esc(p.stage)}</small></button>`).join(""):`<button><b>Aucun projet trouvé</b><small>Essayez un lieu, un thème ou une étape.</small></button>`;results.hidden=false;results.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{const p=PROJECTS.find(x=>x.id===b.dataset.id);state.themes.add(p.theme);state.stages.add(p.stage);renderProjects();map.setView([p.lat,p.lng],12);showProject(p);results.hidden=true;});}
+function resetApplicationState(){
+  state.themes=new Set(Object.keys(THEMES));
+  state.stages=new Set(STAGES);
+  state.communeFilter=null;
+  state.communesVisible=true;
+  $("searchInput").value="";
+  $("searchResults").hidden=true;
+  $("detailPanel").classList.remove("open");
+  document.querySelectorAll("#themeFilters .layer-card,.stage-chip").forEach(x=>x.classList.add("active"));
+  $("toggleCommunes").classList.add("active");
+  if(state.communes){
+    if(!map.hasLayer(state.communes))state.communes.addTo(map);
+    state.communes.eachLayer(x=>x.setStyle({fillOpacity:.08,fillColor:"#e9eef3"}));
+  }
+  renderProjects();
+  window.setTimeout(()=>{
+    map.invalidateSize(false);
+    if(state.communes)map.fitBounds(state.communes.getBounds(),{padding:[15,15],animate:false});
+    else map.setView([49.08,2.1],10,{animate:false});
+  },40);
+}
 async function loadCommunes(){
   try {
     const communes=await fetch("https://geo.api.gouv.fr/departements/95/communes?fields=nom,code,contour").then(r=>{if(!r.ok)throw new Error();return r.json()});
@@ -42,7 +63,16 @@ async function loadCommunes(){
     state.communes=L.geoJSON({type:"FeatureCollection",features},{
       style:{color:"#52677e",weight:.65,opacity:.55,fillColor:"#e9eef3",fillOpacity:.08},
       onEachFeature:(f,l)=>l.bindTooltip(f.properties.nom,{sticky:true}).on("click",()=>{
-        state.communeFilter=state.communeFilter===f.properties.nom?null:f.properties.nom;
+        const communeName=f.properties.nom;
+        const linkedProjects=PROJECTS.filter(p=>p.place.toLowerCase().includes(communeName.toLowerCase()));
+        if(!linkedProjects.length){
+          state.communeFilter=null;
+          state.communes.eachLayer(x=>x.setStyle({fillOpacity:.08,fillColor:"#e9eef3"}));
+          renderProjects();
+          $("mapStatus").textContent=`Aucun projet repéré à ${communeName} · carte inchangée`;
+          return;
+        }
+        state.communeFilter=state.communeFilter===communeName?null:communeName;
         state.communes.eachLayer(x=>x.setStyle({
           fillOpacity:x.feature.properties.nom===state.communeFilter ? .4 : .08,
           fillColor:x.feature.properties.nom===state.communeFilter ? "#000091" : "#e9eef3"
@@ -60,11 +90,11 @@ function openSynthesis(){const counts=Object.keys(THEMES).map(k=>[k,PROJECTS.fil
 
 buildFilters();renderProjects();loadCommunes();
 $("searchButton").onclick=search;$("searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")search();});
-$("resetView").onclick=()=>{state.communeFilter=null;renderProjects();if(state.communes)map.fitBounds(state.communes.getBounds(),{padding:[15,15]});else map.setView([49.08,2.1],10);};
+$("resetView").onclick=resetApplicationState;
 $("selectAll").onclick=()=>{state.themes=new Set(Object.keys(THEMES));state.stages=new Set(STAGES);document.querySelectorAll(".layer-card,.stage-chip").forEach(x=>x.classList.add("active"));renderProjects();};
 $("hideAll").onclick=()=>{state.themes=new Set();document.querySelectorAll("#themeFilters .layer-card").forEach(x=>x.classList.remove("active"));renderProjects();};
 $("toggleCommunes").onclick=e=>{state.communesVisible=!state.communesVisible;e.currentTarget.classList.toggle("active",state.communesVisible);if(state.communes){state.communesVisible?state.communes.addTo(map):map.removeLayer(state.communes);}};
-$("closeDetail").onclick=()=>$("detailPanel").classList.remove("open");
+$("closeDetail").onclick=resetApplicationState;
 $("mobileLayers").onclick=()=>$("layerSidebar").classList.toggle("open");
 [$("openData"),$("openDataTop")].forEach(b=>b.onclick=openSynthesis);$("openMethod").onclick=()=>$("methodDialog").showModal();
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).close());

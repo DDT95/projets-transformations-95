@@ -47,4 +47,10 @@ Post-fix evidence: `/tmp/projets-transformations-95-corrected.png`.
 
 No actionable P0, P1 or P2 visual mismatch remains. Content naturally differs from the service-accessibility reference because this page represents territorial projects.
 
+### Interaction correction
+
+- A commune without a linked project no longer empties the map; the interface reports the absence while keeping the current projects visible.
+- “Recentrer” now resets themes, stages, commune selection, search, details panel, communal styling and department bounds.
+- Closing the right-hand project panel applies the same full reset.
+
 final result: passed
