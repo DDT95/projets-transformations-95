@@ -29,7 +29,6 @@ L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png
 const PERMIT_TYPES={housing:{label:"Permis créant des logements",color:"#0063cb"},business:{label:"Locaux & activités",color:"#a55800"},planning:{label:"Permis d’aménager",color:"#7b3997"}};
 const state={themes:new Set(Object.keys(THEMES)),stages:new Set(STAGES),permitTypes:new Set(Object.keys(PERMIT_TYPES)),markers:new Map(),communes:null,communesVisible:true,communeFilter:null,sitadel:null};
 const projectLayer=L.layerGroup().addTo(map);
-const permitLayer=L.layerGroup().addTo(map);
 
 function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);}
 function markerIcon(theme){return L.divIcon({className:"",html:`<div class="project-marker ${theme}" style="width:22px;height:22px"></div>`,iconSize:[22,22],iconAnchor:[11,11]});}
@@ -43,7 +42,29 @@ function fmt(n){return new Intl.NumberFormat("fr-FR").format(n||0);}
 function permitTotal(c,type){return type==="housing"?c.housingPermits:type==="business"?c.businessPermits:c.planningPermits;}
 function updateCounts(){const permits=state.sitadel?state.sitadel.communes.filter(c=>[...state.permitTypes].some(t=>permitTotal(c,t)>0)&&(!state.communeFilter||c.name===state.communeFilter)).length:0;$("visibleCount").textContent=visibleProjects().length+permits;}
 function showCommuneData(c,type){const titles={housing:"Logements autorisés",business:"Locaux non résidentiels",planning:"Permis d’aménager"};$("detailContent").innerHTML=`<span class="detail-tag">SITADEL · AUTORISATIONS D’URBANISME</span><h2>${esc(c.name)}</h2><div class="detail-location">Données communales · 2022 à juin 2026</div><span class="stage-badge" style="background:${PERMIT_TYPES[type].color}22;color:${PERMIT_TYPES[type].color}">${esc(titles[type])}</span><div class="summary-kpis permit-kpis"><div class="kpi-housing"><strong>${fmt(c.housingPermits)}</strong><span>autorisations logements</span></div><div class="kpi-housing"><strong>${fmt(c.housingUnits)}</strong><span>logements créés déclarés</span></div><div class="kpi-housing"><strong>${fmt(c.housingSurface)} m²</strong><span>surface d’habitation créée</span></div><div class="kpi-business"><strong>${fmt(c.businessPermits)}</strong><span>autorisations de locaux</span></div><div class="kpi-business"><strong>${fmt(c.businessSurface)} m²</strong><span>surface de locaux créée</span></div><div class="kpi-planning"><strong>${fmt(c.planningPermits)}</strong><span>permis d’aménager</span></div></div><h3>Comment lire ces chiffres ?</h3><p>Il s’agit d’autorisations enregistrées dans Sitadel, agrégées à la commune. Une autorisation ne garantit pas le démarrage du chantier et peut évoluer ou être annulée.</p><a class="profile-link" href="https://www.statistiques.developpement-durable.gouv.fr/donnees-des-permis-de-construire-et-autres-autorisations-durbanisme" target="_blank" rel="noreferrer">Consulter la source SDES–Sitadel ↗</a>`;$("detailPanel").classList.add("open");map.panTo([c.lat,c.lng]);}
-function renderPermits(){permitLayer.clearLayers();if(!state.sitadel){updateCounts();return;}state.sitadel.communes.forEach(c=>{if(state.communeFilter&&c.name!==state.communeFilter)return;const active=[...state.permitTypes].filter(type=>permitTotal(c,type)>0);if(!active.length)return;const total=active.reduce((n,type)=>n+permitTotal(c,type),0);const color=active.length===1?PERMIT_TYPES[active[0]].color:"#006a6f";const breakdown=active.map(type=>`${fmt(permitTotal(c,type))} ${PERMIT_TYPES[type].label.toLowerCase()}`).join("<br>");L.circleMarker([c.lat,c.lng],{radius:Math.min(11,3.5+Math.sqrt(total)/3.2),color:"#fff",weight:1.5,fillColor:color,fillOpacity:.68}).bindTooltip(`<strong>${esc(c.name)}</strong><br>${breakdown}`,{direction:"top"}).on("click",()=>showCommuneData(c,active[0])).addTo(permitLayer);});updateCounts();}
+function communeActiveTotal(c){return [...state.permitTypes].filter(type=>permitTotal(c,type)>0).reduce((n,type)=>n+permitTotal(c,type),0);}
+function renderPermits(){
+  updateCounts();
+  if(!state.communes||!state.sitadel)return;
+  const byName=Object.fromEntries(state.sitadel.communes.map(c=>[c.name,c]));
+  const max=Math.max(...state.sitadel.communes.map(communeActiveTotal),1);
+  state.communes.eachLayer(layer=>{
+    const name=layer.feature.properties.nom;
+    const selected=name===state.communeFilter;
+    const c=byName[name];
+    const total=c?communeActiveTotal(c):0;
+    const intensity=Math.min(1,total/max);
+    layer.setStyle({
+      color:selected?"#000091":"#8fa6c9",
+      weight:selected?2.2:.6,
+      fillColor:selected?"#000091":"#0063cb",
+      fillOpacity:selected?.45:(total>0?.1+intensity*.55:.05),
+    });
+    const active=c?[...state.permitTypes].filter(type=>permitTotal(c,type)>0):[];
+    const breakdown=active.length?active.map(type=>`${fmt(permitTotal(c,type))} ${PERMIT_TYPES[type].label.toLowerCase()}`).join("<br>"):"Aucune autorisation recensée depuis 2022";
+    layer.bindTooltip(`<strong>${esc(name)}</strong><br>${breakdown}`,{sticky:true});
+  });
+}
 async function loadSitadel(){try{state.sitadel=await fetch("data/sitadel-95.json").then(r=>r.json());const totals={housing:0,business:0,planning:0};state.sitadel.communes.forEach(c=>{totals.housing+=c.housingPermits;totals.business+=c.businessPermits;totals.planning+=c.planningPermits;});Object.keys(totals).forEach(k=>$("permit-"+k+"-count").textContent=`${fmt(totals[k])} autorisation(s)`);renderPermits();}catch{$("mapStatus").textContent="Données Sitadel momentanément indisponibles";}}
 function search(){const q=$("searchInput").value.trim().toLowerCase();const results=$("searchResults");if(!q){results.hidden=true;return;}const matches=PROJECTS.filter(p=>`${p.name} ${p.place} ${THEMES[p.theme].label} ${p.stage}`.toLowerCase().includes(q));results.innerHTML=matches.length?matches.map(p=>`<button data-id="${p.id}"><b>${esc(p.name)}</b><small>${esc(p.place)} · ${esc(p.stage)}</small></button>`).join(""):`<button><b>Aucun projet trouvé</b><small>Essayez un lieu, un thème ou une étape.</small></button>`;results.hidden=false;results.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{const p=PROJECTS.find(x=>x.id===b.dataset.id);state.themes.add(p.theme);state.stages.add(p.stage);renderProjects();map.setView([p.lat,p.lng],12);showProject(p);results.hidden=true;});}
 function resetApplicationState(){
@@ -66,7 +87,7 @@ function resetApplicationState(){
   renderPermits();
   window.setTimeout(()=>{
     map.invalidateSize(false);
-    if(state.communes)map.fitBounds(state.communes.getBounds(),{padding:[15,15],animate:false});
+    if(state.communes)map.fitBounds(state.communes.getBounds(),{padding:[15,15],animate:false,maxZoom:12});
     else map.setView([49.08,2.1],10,{animate:false});
   },40);
 }
@@ -75,21 +96,19 @@ async function loadCommunes(){
     const communes=await fetch("https://geo.api.gouv.fr/departements/95/communes?fields=nom,code,contour").then(r=>{if(!r.ok)throw new Error();return r.json()});
     const features=communes.filter(c=>c.contour).map(c=>({type:"Feature",properties:{nom:c.nom,code:c.code},geometry:c.contour}));
     state.communes=L.geoJSON({type:"FeatureCollection",features},{
-      style:{color:"#52677e",weight:.65,opacity:.55,fillColor:"#e9eef3",fillOpacity:.08},
-      onEachFeature:(f,l)=>l.bindTooltip(f.properties.nom,{sticky:true}).on("click",()=>{
+      style:{color:"#8fa6c9",weight:.6,opacity:.6,fillColor:"#e9eef3",fillOpacity:.05},
+      onEachFeature:(f,l)=>l.on("click",()=>{
         const communeName=f.properties.nom;
         state.communeFilter=state.communeFilter===communeName?null:communeName;
-        state.communes.eachLayer(x=>x.setStyle({
-          fillOpacity:x.feature.properties.nom===state.communeFilter ? .4 : .08,
-          fillColor:x.feature.properties.nom===state.communeFilter ? "#000091" : "#e9eef3"
-        }));
         renderProjects(true);
         renderPermits();
         const communeData=state.sitadel&&state.sitadel.communes.find(c=>c.name===communeName);
         if(communeData)showCommuneData(communeData,"housing");
       })
     }).addTo(map);
-    map.fitBounds(state.communes.getBounds(),{padding:[15,15]});
+    map.invalidateSize(false);
+    map.fitBounds(state.communes.getBounds(),{padding:[15,15],maxZoom:12});
+    renderPermits();
   } catch {
     $("mapStatus").textContent="Fond communal momentanément indisponible · projets accessibles";
     renderProjects(true);

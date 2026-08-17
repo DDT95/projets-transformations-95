@@ -89,3 +89,9 @@ body{background:radial-gradient(circle at 80% 10%,#dff8ff,transparent 28%),linea
   .summary-kpis div{padding:11px}
   .map-legend.full-legend{max-width:160px;padding:10px 11px}
 }
+.layer-swatch{display:block;width:26px;height:26px;border-radius:8px;flex:none}
+.legend-gradient{margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
+.legend-gradient>span{display:block;font-size:9px;color:var(--muted);margin-bottom:6px;line-height:1.3}
+.gradient-bar{height:8px;border-radius:4px;background:linear-gradient(90deg,#e9eef3,#0063cb)}
+.gradient-labels{display:flex;justify-content:space-between;margin-top:3px}
+.gradient-labels small{font-size:8px;color:var(--muted)}
