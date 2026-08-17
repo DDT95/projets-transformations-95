@@ -99,3 +99,5 @@ body{background:radial-gradient(circle at 80% 10%,#dff8ff,transparent 28%),linea
 .stage-chip i{width:8px;height:8px;border-radius:50%;background:#cbd5e1;flex:none}
 .stage-chip.active{border-color:var(--stage-color);background:color-mix(in srgb,var(--stage-color) 12%,#fff);color:var(--stage-color)}
 .stage-chip.active i{background:var(--stage-color)}
+.layer-group-title small{font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8}
+.stage-chip b{font-weight:800;opacity:.75}
