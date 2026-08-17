@@ -61,6 +61,13 @@ No actionable P0, P1 or P2 visual mismatch remains. Content naturally differs fr
 
 final result: passed
 
+### Correction des projets ferroviaires — août 2026
+
+- Suppression de la ligne pointillée qui reliait artificiellement les trois opérations ferroviaires sans représenter un tracé réel.
+- Conservation des repères individuels et des fiches officielles de chaque opération.
+
+final result: passed
+
 ### Enrichissement des données — août 2026
 
 - 14 grands projets, dont 3 opérations ferroviaires SNCF Réseau documentées.
