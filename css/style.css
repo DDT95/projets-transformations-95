@@ -71,3 +71,21 @@ body{background:radial-gradient(circle at 80% 10%,#dff8ff,transparent 28%),linea
 .theme-list .dot.planning{background:#7452b8}
 .theme-list .dot.environment{background:#178267}
 .theme-list .dot.economy{background:#d28119}
+.summary-kpis div{border-top:4px solid #94a3b8}
+.summary-kpis div.kpi-housing{border-top-color:#0063cb}
+.summary-kpis div.kpi-business{border-top-color:#a55800}
+.summary-kpis div.kpi-planning{border-top-color:#7b3997}
+.summary-kpis div.kpi-project{border-top-color:#000091}
+.map-legend.full-legend{max-width:240px;padding:13px 15px}
+.map-legend.full-legend .legend-title{display:block;font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--navy);margin-bottom:8px}
+.map-legend.full-legend .legend-row{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--ink);margin-top:6px}
+.map-legend.full-legend .legend-row i{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 0 2px #fff,0 1px 4px #0002}
+.map-legend.full-legend .legend-count{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:9px;color:var(--muted)}
+.map-legend.full-legend .legend-count strong{color:var(--blue);font-size:16px;display:block}
+@media(max-width:700px){
+  .summary-kpis,.permit-kpis{grid-template-columns:1fr 1fr!important;gap:7px}
+  .summary-kpis strong{font-size:17px}
+  .summary-kpis span{font-size:8px;line-height:1.25}
+  .summary-kpis div{padding:11px}
+  .map-legend.full-legend{max-width:160px;padding:10px 11px}
+}
