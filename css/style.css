@@ -95,3 +95,7 @@ body{background:radial-gradient(circle at 80% 10%,#dff8ff,transparent 28%),linea
 .gradient-bar{height:8px;border-radius:4px;background:linear-gradient(90deg,#e9eef3,#0063cb)}
 .gradient-labels{display:flex;justify-content:space-between;margin-top:3px}
 .gradient-labels small{font-size:8px;color:var(--muted)}
+.stage-chip{display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid var(--line);border-radius:99px;background:#fff;color:#94a3b8;font-size:9px;font-weight:700;cursor:pointer}
+.stage-chip i{width:8px;height:8px;border-radius:50%;background:#cbd5e1;flex:none}
+.stage-chip.active{border-color:var(--stage-color);background:color-mix(in srgb,var(--stage-color) 12%,#fff);color:var(--stage-color)}
+.stage-chip.active i{background:var(--stage-color)}
