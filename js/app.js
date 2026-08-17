@@ -34,10 +34,10 @@ const permitLayer=L.layerGroup().addTo(map);
 function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);}
 function markerIcon(theme){return L.divIcon({className:"",html:`<div class="project-marker ${theme}" style="width:22px;height:22px"></div>`,iconSize:[22,22],iconAnchor:[11,11]});}
 function visibleProjects(){return PROJECTS.filter(p=>state.themes.has(p.theme)&&state.stages.has(p.stage)&&(!state.communeFilter||p.place.toLowerCase().includes(state.communeFilter.toLowerCase())));}
-function renderProjects(fit=false){projectLayer.clearLayers();state.markers.clear();const visible=visibleProjects();visible.forEach(p=>{const marker=L.marker([p.lat,p.lng],{icon:markerIcon(p.theme)}).bindTooltip(`<strong>${esc(p.name)}</strong><br>${esc(p.place)}`,{direction:"top"}).on("click",()=>showProject(p)).addTo(projectLayer);state.markers.set(p.id,marker);});updateCounts();$("filterCount").textContent=visible.length;$("mapStatus").textContent=state.communeFilter?`Données et projets à ${state.communeFilter}`:"Cliquez un projet ou un cercle Sitadel pour ouvrir sa fiche";if(fit&&visible.length){const bounds=L.latLngBounds(visible.map(p=>[p.lat,p.lng]));map.fitBounds(bounds,{padding:[55,55],maxZoom:11});}}
+function renderProjects(fit=false){projectLayer.clearLayers();state.markers.clear();const visible=visibleProjects();visible.forEach(p=>{const marker=L.marker([p.lat,p.lng],{icon:markerIcon(p.theme)}).bindTooltip(`<strong>${esc(p.name)}</strong><br>${esc(p.place)}`,{direction:"top"}).on("click",()=>showProject(p)).addTo(projectLayer);state.markers.set(p.id,marker);});updateCounts();$("mapStatus").textContent=state.communeFilter?`Données et projets à ${state.communeFilter}`:"Cliquez un projet ou un cercle Sitadel pour ouvrir sa fiche";if(fit&&visible.length){const bounds=L.latLngBounds(visible.map(p=>[p.lat,p.lng]));map.fitBounds(bounds,{padding:[55,55],maxZoom:11});}}
 function showProject(p){const theme=THEMES[p.theme];$("detailContent").innerHTML=`<span class="detail-tag">${esc(p.kind==="rail"?"PROJET FERROVIAIRE":theme.label.toUpperCase())}</span><h2>${esc(p.name)}</h2><div class="detail-location">${esc(p.place)}</div><span class="stage-badge">${esc(p.stage)} · ${esc(p.horizon)}</span><p>${esc(p.summary)}</p><h3>Repères du projet</h3><div class="detail-meta"><div><small>PORTEUR / RÉFÉRENT</small><strong>${esc(p.owner)}</strong></div><div><small>ÉTAPE AFFICHÉE</small><strong>${esc(p.stage)}</strong></div>${p.scale?`<div><small>ÉCHELLE / PROGRAMME</small><strong>${esc(p.scale)}</strong></div>`:""}${p.calendar?`<div><small>CALENDRIER</small><strong>${esc(p.calendar)}</strong></div>`:""}</div><p>Le repère localise le secteur principal et ne représente pas une emprise juridique ou foncière.</p><a class="profile-link" href="${esc(p.source)}" target="_blank" rel="noreferrer">Consulter la source officielle ↗</a>`;$("detailPanel").classList.add("open");map.panTo([p.lat,p.lng]);}
 
-function buildFilters(){const themes=$("themeFilters");Object.entries(THEMES).forEach(([key,t])=>{const count=PROJECTS.filter(p=>p.theme===key).length;const b=document.createElement("button");b.className="layer-card active";b.innerHTML=`<i class="layer-swatch ${key}"></i><span><b>${t.label}</b><small>${count} projet(s) repéré(s)</small></span><i class="layer-switch"></i>`;b.onclick=()=>{state.themes.has(key)?state.themes.delete(key):state.themes.add(key);b.classList.toggle("active",state.themes.has(key));renderProjects();};themes.appendChild(b);});const permits=$("permitFilters");Object.entries(PERMIT_TYPES).forEach(([key,t])=>{const b=document.createElement("button");b.className="layer-card active";b.dataset.permit=key;b.innerHTML=`<i class="layer-swatch permit-${key}"></i><span><b>${t.label}</b><small id="permit-${key}-count">chargement…</small></span><i class="layer-switch"></i>`;b.onclick=()=>{state.permitTypes.has(key)?state.permitTypes.delete(key):state.permitTypes.add(key);b.classList.toggle("active",state.permitTypes.has(key));renderPermits();};permits.appendChild(b);});const stages=$("stageFilters");STAGES.forEach(stage=>{const b=document.createElement("button");b.className="stage-chip active";b.textContent=stage;b.onclick=()=>{state.stages.has(stage)?state.stages.delete(stage):state.stages.add(stage);b.classList.toggle("active",state.stages.has(stage));renderProjects();};stages.appendChild(b);});}
+function buildFilters(){const themes=$("themeFilters");Object.entries(THEMES).forEach(([key,t])=>{const count=PROJECTS.filter(p=>p.theme===key).length;const row=document.createElement("label");row.className="layer-row";row.innerHTML=`<i class="layer-swatch ${key}"></i><span class="layer-label"><strong>${t.label}</strong><small>${count} projet(s) repéré(s)</small></span><input type="checkbox" checked>`;row.querySelector("input").onchange=e=>{e.target.checked?state.themes.add(key):state.themes.delete(key);renderProjects();};themes.appendChild(row);});const permits=$("permitFilters");Object.entries(PERMIT_TYPES).forEach(([key,t])=>{const row=document.createElement("label");row.className="layer-row";row.dataset.permit=key;row.innerHTML=`<i class="layer-swatch permit-${key}"></i><span class="layer-label"><strong>${t.label}</strong><small id="permit-${key}-count">chargement…</small></span><input type="checkbox" checked>`;row.querySelector("input").onchange=e=>{e.target.checked?state.permitTypes.add(key):state.permitTypes.delete(key);renderPermits();};permits.appendChild(row);});const stages=$("stageFilters");STAGES.forEach(stage=>{const b=document.createElement("button");b.className="stage-chip active";b.textContent=stage;b.onclick=()=>{state.stages.has(stage)?state.stages.delete(stage):state.stages.add(stage);b.classList.toggle("active",state.stages.has(stage));renderProjects();};stages.appendChild(b);});}
 
 function fmt(n){return new Intl.NumberFormat("fr-FR").format(n||0);}
 function permitTotal(c,type){return type==="housing"?c.housingPermits:type==="business"?c.businessPermits:c.planningPermits;}
@@ -55,8 +55,9 @@ function resetApplicationState(){
   $("searchInput").value="";
   $("searchResults").hidden=true;
   $("detailPanel").classList.remove("open");
-  document.querySelectorAll("#themeFilters .layer-card,#permitFilters .layer-card,.stage-chip").forEach(x=>x.classList.add("active"));
-  $("toggleCommunes").classList.add("active");
+  document.querySelectorAll("#themeFilters input,#permitFilters input").forEach(x=>x.checked=true);
+  document.querySelectorAll(".stage-chip").forEach(x=>x.classList.add("active"));
+  $("toggleCommunes").checked=true;
   if(state.communes){
     if(!map.hasLayer(state.communes))state.communes.addTo(map);
     state.communes.eachLayer(x=>x.setStyle({fillOpacity:.08,fillColor:"#e9eef3"}));
@@ -94,15 +95,40 @@ async function loadCommunes(){
     renderProjects(true);
   }
 }
-function openSynthesis(){const counts=Object.keys(THEMES).map(k=>[k,PROJECTS.filter(p=>p.theme===k).length]);const cs=state.sitadel?.communes||[];const housing=cs.reduce((n,c)=>n+c.housingUnits,0),business=cs.reduce((n,c)=>n+c.businessSurface,0),planning=cs.reduce((n,c)=>n+c.planningPermits,0);const d=$("synthesisContent");d.innerHTML=`<span class="eyebrow">DONNÉES & ÉVOLUTIONS</span><h2>Le territoire en transformation</h2><p>Grands projets documentés et dynamique récente des autorisations d’urbanisme.</p><div class="summary-kpis"><div><strong>${PROJECTS.length}</strong><span>grands projets repérés</span></div><div><strong>${PROJECTS.filter(p=>p.kind==="rail").length}</strong><span>projets ferroviaires</span></div><div><strong>${fmt(housing)}</strong><span>logements autorisés depuis 2022</span></div><div><strong>${fmt(business)} m²</strong><span>locaux autorisés</span></div><div><strong>${fmt(planning)}</strong><span>permis d’aménager</span></div><div><strong>juin 2026</strong><span>dernière période Sitadel</span></div></div><div class="summary-list">${counts.map(([k,n])=>`<button data-theme="${k}"><i class="dot ${k}"></i><b>${THEMES[k].label}</b><small>${n} projets</small></button>`).join("")}</div><p class="data-caveat">Les volumes Sitadel décrivent des autorisations, pas des mises en chantier. Ils sont agrégés à la commune.</p>`;d.querySelectorAll("[data-theme]").forEach(b=>b.onclick=()=>{$("synthesisDialog").close();state.themes=new Set([b.dataset.theme]);document.querySelectorAll("#themeFilters .layer-card").forEach((x,i)=>x.classList.toggle("active",Object.keys(THEMES)[i]===b.dataset.theme));renderProjects(true);});$("synthesisDialog").showModal();}
+function openSynthesis(){
+  const counts=Object.keys(THEMES).map(k=>[k,PROJECTS.filter(p=>p.theme===k).length]);
+  const cs=state.sitadel?.communes||[];
+  const housing=cs.reduce((n,c)=>n+c.housingUnits,0),business=cs.reduce((n,c)=>n+c.businessSurface,0),planning=cs.reduce((n,c)=>n+c.planningPermits,0);
+  const d=$("dashboardContent");
+  d.innerHTML=`
+    <div class="dialog-header"><span class="eyebrow">SYNTHÈSE DÉPARTEMENTALE</span><h2>Le territoire en transformation</h2><p>Grands projets documentés et dynamique récente des autorisations d’urbanisme.</p></div>
+    <div class="dashboard-kpis">
+      <article><small>GRANDS PROJETS</small><strong>${PROJECTS.length}</strong><span>repérés dans le Val-d’Oise</span></article>
+      <article><small>PROJETS FERROVIAIRES</small><strong>${PROJECTS.filter(p=>p.kind==="rail").length}</strong><span>parmi les grands projets</span></article>
+      <article><small>LOGEMENTS AUTORISÉS</small><strong>${fmt(housing)}</strong><span>déclarés depuis 2022 · Sitadel</span></article>
+      <article><small>LOCAUX AUTORISÉS</small><strong>${fmt(business)} m²</strong><span>activités et équipements</span></article>
+      <article><small>PERMIS D’AMÉNAGER</small><strong>${fmt(planning)}</strong><span>autorisations Sitadel</span></article>
+      <article><small>DERNIÈRE PÉRIODE</small><strong>Juin 2026</strong><span>diffusion SDES–Sitadel</span></article>
+    </div>
+    <div class="dashboard-grid">
+      <article class="chart-card span-2"><h3>Grands projets par thématique</h3><p>Cliquez une thématique pour la retrouver sur la carte</p><div class="theme-list">${counts.map(([k,n])=>`<button data-theme="${k}"><i class="dot ${k}"></i><b>${THEMES[k].label}</b><small>${n} projet(s)</small></button>`).join("")}</div></article>
+      <article class="dashboard-note"><span>COMMENT LIRE</span><h3>Autorisation ≠ chantier</h3><p>Les volumes Sitadel décrivent des autorisations d’urbanisme, pas des mises en chantier. Ils sont agrégés à la commune, pas à la parcelle.</p></article>
+    </div>`;
+  d.querySelectorAll("[data-theme]").forEach(b=>b.onclick=()=>{
+    $("dashboardDialog").close();
+    state.themes=new Set([b.dataset.theme]);
+    document.querySelectorAll("#themeFilters input").forEach((x,i)=>x.checked=Object.keys(THEMES)[i]===b.dataset.theme);
+    renderProjects(true);
+  });
+  $("dashboardDialog").showModal();
+}
 
 buildFilters();renderProjects();loadSitadel();loadCommunes();
 $("searchButton").onclick=search;$("searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")search();});
 $("resetView").onclick=resetApplicationState;
-$("selectAll").onclick=()=>{state.themes=new Set(Object.keys(THEMES));state.stages=new Set(STAGES);state.permitTypes=new Set(Object.keys(PERMIT_TYPES));document.querySelectorAll(".layer-card,.stage-chip").forEach(x=>x.classList.add("active"));renderProjects();renderPermits();};
-$("hideAll").onclick=()=>{state.themes=new Set();state.permitTypes=new Set();document.querySelectorAll("#themeFilters .layer-card,#permitFilters .layer-card").forEach(x=>x.classList.remove("active"));renderProjects();renderPermits();};
-$("toggleCommunes").onclick=e=>{state.communesVisible=!state.communesVisible;e.currentTarget.classList.toggle("active",state.communesVisible);if(state.communes){state.communesVisible?state.communes.addTo(map):map.removeLayer(state.communes);}};
+$("clearLayers").onclick=()=>{state.themes=new Set();state.permitTypes=new Set();document.querySelectorAll("#themeFilters input,#permitFilters input").forEach(x=>x.checked=false);renderProjects();renderPermits();};
+$("toggleCommunes").onchange=e=>{state.communesVisible=e.target.checked;if(state.communes){state.communesVisible?state.communes.addTo(map):map.removeLayer(state.communes);}};
 $("closeDetail").onclick=resetApplicationState;
 $("mobileLayers").onclick=()=>$("layerSidebar").classList.toggle("open");
-[$("openData"),$("openDataTop")].forEach(b=>b.onclick=openSynthesis);$("openMethod").onclick=()=>$("methodDialog").showModal();
+$("openData").onclick=openSynthesis;$("openMethod").onclick=()=>$("methodDialog").showModal();
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).close());

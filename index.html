@@ -1,60 +1,89 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="description" content="Les grands projets et transformations territoriales du Val-d’Oise" />
-    <title>Projets & transformations · Val-d’Oise · DDT 95</title>
-    <link rel="preconnect" href="https://tile.openstreetmap.org" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-    <link rel="stylesheet" href="css/style.css?v=3" />
-  </head>
-  <body>
-    <main class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="https://ddt95.github.io/atlas-territorial-95/#comprendre">
-        <img src="https://ddt95.github.io/atlas-territorial-95/prefet-val-doise-logo.png" alt="Préfet du Val-d’Oise" />
-      </a>
-      <div class="title">
-        <small>PROJETS TERRITORIAUX · VAL-D’OISE</small>
-        <h1>Projets & transformations territoriales</h1>
-        <p><strong>Val-d’Oise</strong> · aménagement · mobilités · quartiers · cadre de vie</p>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Les grands projets et transformations territoriales du Val-d’Oise — DDT 95">
+  <title>Projets & transformations · Val-d’Oise · DDT 95</title>
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="css/style.css?v=5">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand-logo-link" href="https://ddt95.github.io/atlas-territorial-95/" aria-label="Retour à l’Atlas territorial"><img class="brand-logo" src="https://ddt95.github.io/atlas-territorial-95/prefet-val-doise-logo.png" alt="Préfet du Val-d’Oise"></a>
+    <div class="title-block">
+      <span class="eyebrow">PROJETS TERRITORIAUX · VAL-D’OISE</span>
+      <h1>Projets & transformations territoriales</h1>
+      <p>Aménagement · mobilités · quartiers · cadre de vie</p>
+    </div>
+    <button id="mobileLayers" class="mobile-layers" aria-controls="layerSidebar" aria-expanded="false">Données</button>
+    <div class="livebox"><span class="fresh-dot"></span><div><strong id="headlineCount">14 grands projets suivis</strong><small>SDES–Sitadel · SNCF Réseau</small></div></div>
+  </header>
+  <div class="progress"><span></span></div>
+
+  <main class="workspace">
+    <aside id="layerSidebar" class="sidebar" aria-label="Recherche et filtres">
+      <div class="sidebar-intro"><div><span class="eyebrow">RECHERCHER ET COMPRENDRE</span><h2>Les projets qui<br>transforment le territoire</h2><p>Recherchez un lieu, filtrez les projets, puis cliquez sur un point pour ouvrir sa fiche complète.</p></div></div>
+
+      <label class="search-box">
+        <span>Projet, permis ou commune</span>
+        <div><input id="searchInput" type="search" placeholder="Gonesse, ferroviaire, logements…" autocomplete="off"><button id="searchButton" aria-label="Rechercher">→</button></div>
+      </label>
+      <div id="searchResults" class="search-results" hidden></div>
+
+      <div class="quick-actions"><button id="resetView">Recentrer</button><button id="openData">Données & évolutions</button></div>
+
+      <div class="theme-heading"><span>AFFICHAGE DE LA CARTE</span><button id="clearLayers">Tout effacer</button></div>
+      <div id="layerList" class="layer-list">
+        <div id="themeFilters" class="layer-group"></div>
+        <div class="layer-group-title">AUTORISATIONS D’URBANISME</div>
+        <div id="permitFilters" class="layer-group"></div>
+        <div class="layer-group-title">ÉTAPES DU PROJET</div>
+        <div id="stageFilters" class="stage-filters"></div>
+        <label class="layer-row"><i class="layer-swatch commune"></i><span class="layer-label"><strong>Limites communales</strong><small>183 communes · cliquez pour filtrer</small></span><input type="checkbox" id="toggleCommunes" checked></label>
       </div>
-      <button id="mobileLayers" class="mobile-layers">Données</button>
-      <button id="openDataTop" class="headline-count"><i></i><div><strong>Données & évolutions</strong><span>Synthèse départementale</span></div></button>
-    </header>
 
-    <section class="workspace">
-      <aside id="layerSidebar" class="filters">
-        <div class="intro"><span class="kicker">RECHERCHER ET COMPRENDRE</span><h2>Les projets qui<br><span>transforment le territoire</span></h2><p>Recherchez un lieu, filtrez les projets, puis cliquez sur un point pour ouvrir sa fiche complète.</p></div>
-        <label class="search"><span>Projet, permis ou commune</span><div><input id="searchInput" type="search" placeholder="Gonesse, ferroviaire, logements…" /><button id="searchButton">Rechercher</button></div><small><b id="filterCount">12</b> grand(s) projet(s) affiché(s)</small></label>
-        <div id="searchResults" class="search-results" hidden></div>
-        <div class="quick-actions"><button id="resetView">Recentrer</button><button id="openData">Données & évolutions</button></div>
-        <div class="category-list" aria-label="Filtres cartographiques">
-            <div class="list-title"><strong>AFFICHAGE DE LA CARTE</strong><div><button id="hideAll" type="button">Tout masquer</button><button id="selectAll" type="button">Tout afficher</button></div></div>
-            <div id="themeFilters" class="layer-cards"></div>
-            <div class="list-title stage"><strong>AUTORISATIONS D’URBANISME</strong></div>
-            <div id="permitFilters" class="layer-cards data-layers"></div>
-            <div class="list-title stage"><strong>ÉTAPES DU PROJET</strong></div>
-            <div id="stageFilters" class="stage-filters"></div>
-            <button class="layer-card active" id="toggleCommunes"><i class="layer-swatch commune"></i><span><b>Limites communales</b><small>183 communes · cliquez pour filtrer</small></span><i class="layer-switch"></i></button>
-        </div>
-        <div class="source-note"><button id="openMethod">Sources mobilisées</button><span>SDES–Sitadel · SNCF Réseau · maîtres d’ouvrage</span><small>Données Sitadel à juin 2026 · projets vérifiés août 2026</small></div>
-      </aside>
+      <button id="openMethod" class="sources-inline">Sources mobilisées</button>
+      <div class="sidebar-footer">
+        <div class="fresh-dot"></div>
+        <div><strong>SDES–Sitadel · SNCF Réseau · maîtres d’ouvrage</strong><small>Données Sitadel à juin 2026 · projets vérifiés août 2026</small></div>
+      </div>
+    </aside>
 
-      <section class="map-wrap">
-        <div id="map"></div>
-        <div class="map-note"><i></i><span id="mapStatus">Cliquez un projet pour ouvrir sa fiche</span></div>
-        <div id="mapLegend" class="map-legend"><strong id="visibleCount">0</strong><span>objets dans la sélection</span></div>
-      </section>
-      <aside id="detailPanel" class="detail-panel"><button id="closeDetail" class="close-btn">×</button><div id="detailContent"></div></aside>
+    <section class="map-shell" aria-label="Carte interactive">
+      <div id="map"></div>
+      <div id="mapLegend" class="map-legend"><strong id="visibleCount">0</strong><span>objets dans la sélection</span></div>
+      <div class="map-note"><span class="pulse"></span><span id="mapStatus">Cliquez un projet pour ouvrir sa fiche</span></div>
     </section>
 
-    <dialog id="synthesisDialog" class="dialog synthesis-dialog"><button class="dialog-close" data-close="synthesisDialog">×</button><div id="synthesisContent" class="synthesis-dashboard"></div></dialog>
-    <dialog id="methodDialog" class="dialog"><button class="dialog-close" data-close="methodDialog">×</button><div class="dialog-header"><span class="eyebrow">DONNÉES</span><h2>Sources et méthode</h2><p>Trois niveaux de lecture, avec leur précision propre.</p></div><div class="dialog-body"><h3>Grands projets</h3><p>Sélection éditoriale de transformations structurantes documentées par les maîtres d’ouvrage. Les points et corridors situent le secteur principal sans représenter une emprise juridique.</p><h3>Autorisations d’urbanisme</h3><p>Extraction SDES–Sitadel des autorisations déposées depuis 2022, diffusion de juillet 2026. Les résultats sont agrégés au centre de chaque commune : ils décrivent une dynamique communale, pas la parcelle d’un permis.</p><h3>À lire avec précaution</h3><p>Une autorisation n’est ni un chantier commencé ni un bâtiment livré. Les annulations, modificatifs et délais de réalisation expliquent les écarts avec la construction observée.</p><h3>Sources</h3><p>SDES–Sitadel, SNCF Réseau, Société des grands projets, Île-de-France Mobilités, Grand Paris Aménagement, Préfecture et collectivités porteuses.</p></div></dialog>
+    <aside id="detailPanel" class="detail-panel" aria-live="polite">
+      <button id="closeDetail" class="close-btn" aria-label="Fermer le panneau">×</button>
+      <div id="detailContent"></div>
+    </aside>
+  </main>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <script src="js/app.js?v=4"></script>
-    </main>
-  </body>
+  <dialog id="dashboardDialog" class="dialog dashboard-dialog">
+    <button class="dialog-close" data-close="dashboardDialog" aria-label="Fermer">×</button>
+    <div id="dashboardContent"></div>
+  </dialog>
+
+  <dialog id="methodDialog" class="dialog">
+    <button class="dialog-close" data-close="methodDialog" aria-label="Fermer">×</button>
+    <div class="dialog-header"><span class="eyebrow">DONNÉES</span><h2>Sources et méthode</h2><p>Trois niveaux de lecture, avec leur précision propre.</p></div>
+    <div class="dialog-body">
+      <h3>Grands projets</h3>
+      <p>Sélection éditoriale de transformations structurantes documentées par les maîtres d’ouvrage. Les points et corridors situent le secteur principal sans représenter une emprise juridique.</p>
+      <h3>Autorisations d’urbanisme</h3>
+      <p>Extraction SDES–Sitadel des autorisations déposées depuis 2022, diffusion de juillet 2026. Les résultats sont agrégés au centre de chaque commune : ils décrivent une dynamique communale, pas la parcelle d’un permis.</p>
+      <h3>À lire avec précaution</h3>
+      <p>Une autorisation n’est ni un chantier commencé ni un bâtiment livré. Les annulations, modificatifs et délais de réalisation expliquent les écarts avec la construction observée.</p>
+      <h3>Sources</h3>
+      <p>SDES–Sitadel, SNCF Réseau, Société des grands projets, Île-de-France Mobilités, Grand Paris Aménagement, Préfecture et collectivités porteuses.</p>
+    </div>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="js/app.js?v=5"></script>
+</body>
 </html>
