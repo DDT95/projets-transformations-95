@@ -26,7 +26,7 @@ const PROJECTS = [
 
 const map = L.map("map", { zoomControl:false,preferCanvas:true }).setView([49.08,2.1],10);
 L.control.zoom({position:"bottomright"}).addTo(map);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,attribution:"© OpenStreetMap · © CARTO"}).addTo(map);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(map);
 const PERMIT_TYPES={housing:{label:"Permis créant des logements",color:"#0063cb"},business:{label:"Locaux & activités",color:"#a55800"},planning:{label:"Permis d’aménager",color:"#7b3997"}};
 const state={themes:new Set(Object.keys(THEMES)),stages:new Set(STAGES),permitType:"housing",markers:new Map(),communes:null,communesVisible:true,communeFilter:null,sitadel:null};
 const projectLayer=L.layerGroup().addTo(map);
